@@ -8,6 +8,19 @@ There are three sections: Top, Middle, and Bottom — please refer to the image 
 
 ---
 
+## ✨ Support
+
+Like the project? Why not toss a coin to your developer — just €5 keeps the magic going! 💰  
+<a href="https://ko-fi.com/flopp999" target="_blank">
+  <img src="https://github.githubassets.com/assets/ko_fi-53a60c17e75c.svg" width="32" height="32" alt="Buy me a coffee">https://ko-fi.com/flopp999
+</a>
+
+<a href="https://www.buymeacoffee.com/flopp999" target="_blank">
+  <img src="bmc-logo-yellow.png" width="32" height="32" alt="Buy me a coffee">https://www.buymeacoffee.com/flopp999
+</a>  
+
+---
+
 ## 📄 License
 
 **Personal use only.** See [`LICENSE`](LICENSE) for details.
@@ -67,5 +80,5 @@ Explanation of the elements in the widget:
 ![plot](Scriptable-NordPool.png)
 
 ---
-
+This widget is an independent entity and is not affiliated with or endorsed by Nord Pool.  
 Made with ❤️ by [@flopp999](https://github.com/flopp999)
