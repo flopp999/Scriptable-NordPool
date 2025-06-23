@@ -1,230 +1,248 @@
 {
-  "": {
-    "en": "",
-    "sv": "",
-    "de": ""
-  },
-  "": {
-    "en": "",
-    "sv": "",
-    "de": ""
-  },
   "after13": {
     "en": "Available after 13:00",
     "sv": "Tillgängligt efter 13:00",
-    "de": "Available after 13:00"
-  },  
+    "de": "Available after 13:00",
+    "nl": "Beschikbaar na 13:00"
+  },
   "bar": {
     "en": "Bar",
     "sv": "Stapel",
-    "de": "Bar"
+    "de": "Bar",
+    "nl": "Staaf"
   },
   "line": {
     "en": "Line",
     "sv": "Linje",
-    "de": "Line"
+    "de": "Line",
+    "nl": "Lijn"
   },
   "choosegraphtype": {
     "en": "Select chart type",
     "sv": "Välj typ av graf",
-    "de": "Select chart type"
+    "de": "Select chart type",
+    "nl": "Selecteer grafiektype"
   },
   "now": {
     "en": "Now",
     "sv": "Nu",
-    "de": "Now"
+    "de": "Now",
+    "nl": "Nu"
   },
   "top": {
     "en": "at the top",
     "sv": "högst upp",
-    "de": "at the top"
+    "de": "at the top",
+    "nl": "bovenaan"
   },
   "middle": {
     "en": "in the middle",
     "sv": "i mitten",
-    "de": "in the middle"
+    "de": "in the middle",
+    "nl": "in het midden"
   },
   "bottom": {
     "en": "at the bottom",
     "sv": "längst ner",
-    "de": "at the bottom"
+    "de": "at the bottom",
+    "nl": "onderaan"
   },
   "tomorrow": {
     "en": "Tomorrow",
     "sv": "Imorgon",
-    "de": "Tomorrow"
+    "de": "Tomorrow",
+    "nl": "Morgen"
   },
   "today": {
     "en": "Today",
     "sv": "Idag",
-    "de": "Today"
+    "de": "Today",
+    "nl": "Vandaag"
   },
   "showday": {
     "en": "Electricity price for",
     "sv": "Elpris för",
-    "de": "Electricity price for"
+    "de": "Electricity price for",
+    "nl": "Elektriciteitsprijs voor"
   },
   "nothing": {
     "en": "Nothing",
     "sv": "Inget",
-    "de": "Nothing"
+    "de": "Nothing",
+    "nl": "Niets"
   },
   "pricestats": {
     "en": "Price Stats",
     "sv": "Prisstatistik",
-    "de": "Price Stats"
+    "de": "Price Stats",
+    "nl": "Prijsstatistieken"
   },
   "graph": {
     "en": "Graph",
     "sv": "Graf",
-    "de": "Graph"
+    "de": "Graph",
+    "nl": "Grafiek"
   },
   "table": {
     "en": "Table",
     "sv": "Tabell",
-    "de": "Table"
+    "de": "Table",
+    "nl": "Tabel"
   },
   "showwhat": {
     "en": "What should the widget show",
     "sv": "Vad ska widgeten visa",
-    "de": "What should the widget show"
+    "de": "What should the widget show",
+    "nl": "Wat moet de widget tonen"
   },
   "showtable": {
     "en": "Do you want the electricity prices in a table",
     "sv": "Vill du ha elpriserna i en tabell",
-    "de": "Do you want the electricity prices in a table"
+    "de": "Do you want the electricity prices in a table",
+    "nl": "Wilt u de elektriciteitsprijzen in een tabel"
   },
   "showgraph": {
     "en": "Do you want the electricity prices in a graph",
     "sv": "Vill du ha elpriserna i en graf",
-    "de": "Do you want the electricity prices in a graph"
+    "de": "Do you want the electricity prices in a graph",
+    "nl": "Wilt u de elektriciteitsprijzen in een grafiek"
   },
   "area": {
     "en": "Area",
     "sv": "Område",
-    "de": "Area"
+    "de": "Area",
+    "nl": "Gebied"
   },
   "vat": {
     "en": "VAT",
     "sv": "Moms",
-    "de": "VAT"
+    "de": "VAT",
+    "nl": "BTW"
   },
-  
   "buymeacoffee": {
     "en": "Do you want to buy me a coffee",
     "sv": "Vill du köpa en kaffe åt mig",
-    "de": "Do you want to buy me a coffee"
+    "de": "Do you want to buy me a coffee",
+    "nl": "Wil je me een kop koffie geven"
   },
-  
   "changesetup": {
     "en": "Do you want to change the setup",
     "sv": "Vill du ändra sparade inställningar",
-    "de": "Do you want to change the setup"
+    "de": "Do you want to change the setup",
+    "nl": "Wilt u de instellingen wijzigen"
   },
-  
   "ofcourse": {
     "en": "Of course",
     "sv": "Självklart",
-    "de": "Of course"
+    "de": "Of course",
+    "nl": "Natuurlijk"
   },
-  
-    "noway": {
+  "noway": {
     "en": "No way :)",
     "sv": "Glöm det :)",
-    "de": "No way :)"
+    "de": "No way :)",
+    "nl": "Geen sprake van :)"
   },
-  
-    "no": {
+  "no": {
     "en": "No",
     "sv": "Nej",
-    "de": "No"
+    "de": "No",
+    "nl": "Nee"
   },
-    "yes": {
+  "yes": {
     "en": "Yes",
     "sv": "Ja",
-    "de": "Yes"
+    "de": "Yes",
+    "nl": "Ja"
   },
-    "enterextra": {
+  "enterextra": {
     "en": "Enter the total extra cost per kWh incl. VAT(e.g. grid fees, taxes, markup) in ",
     "sv": "Skriv in totala extra kostnader per kWh inkl. moms(t.ex. överföringsavgift, skatt) i ",
-    "de": "Enter the total extra cost per kWh incl. VAT(e.g. grid fees, taxes, markup) in "
+    "de": "Enter the total extra cost per kWh incl. VAT(e.g. grid fees, taxes, markup) in ",
+    "nl": "Voer de totale extra kosten per kWh in incl. BTW (bijv. netwerkkosten, belastingen, toeslagen) in "
   },
-    "extraelectricitycost": {
+  "extraelectricitycost": {
     "en": "Extra Electricity Cost",
     "sv": "Extra elkostnader",
-    "de": "Extra Electricity Cost"
+    "de": "Extra Electricity Cost",
+    "nl": "Extra elektriciteitskosten"
   },
-  
   "withvat": {
     "en": "With VAT",
     "sv": "Med moms",
-    "de": "With VAT"
+    "de": "With VAT",
+    "nl": "Inclusief BTW"
   },
-  
   "withoutvat": {
     "en": "Without VAT",
     "sv": "Utan moms",
-    "de": "Ohne MwSt."
-  },  
-
+    "de": "Ohne MwSt.",
+    "nl": "Exclusief BTW"
+  },
   "doyouwantvat": {
     "en": "Do you want the prices shown with or without VAT",
     "sv": "Hur ska elpriserna visas",
-    "de": "Möchten Sie die Preise mit oder ohne Mehrwertsteuer angezeigt bekommen"
+    "de": "Möchten Sie die Preise mit oder ohne Mehrwertsteuer angezeigt bekommen",
+    "nl": "Wilt u de prijzen inclusief of exclusief BTW zien"
   },
-  
   "chooseyourcurrency": {
     "en": "Choose your currency",
     "sv": "Välj valuta",
-    "de": "Choose your currency"
+    "de": "Choose your currency",
+    "nl": "Kies uw valuta"
   },
-
-  
   "choosedataresolution": {
     "en": "Choose Data Resolution",
     "sv": "Välj tidsintervall",
-    "de": "Choose Data Resolution"
+    "de": "Choose Data Resolution",
+    "nl": "Kies gegevensresolutie"
   },
-  
   "chooseyourelectricityarea": {
     "en": "Choose your electricity area",
     "sv": "Välj ditt elområde",
-    "de": "Choose your electricity area"
+    "de": "Choose your electricity area",
+    "nl": "Kies uw elektriciteitsgebied"
   },
   "image_load_error": {
     "en": "Could not load image",
     "sv": "Kunde inte ladda bilden",
-    "de": "Bild konnte nicht geladen werden"
+    "de": "Bild konnte nicht geladen werden",
+    "nl": "Kon afbeelding niet laden"
   },
   "lowest": {
     "en": "lowest",
     "sv": "lägsta",
-    "de": "niedrigste"
+    "de": "niedrigste",
+    "nl": "laagste"
   },
   "average": {
     "en": "average",
     "sv": "medel",
-    "de": "durchschnittlich"
+    "de": "durchschnittlich",
+    "nl": "gemiddelde"
   },
   "highest": {
     "en": "highest",
     "sv": "högsta",
-    "de": "höchste"
+    "de": "höchste",
+    "nl": "hoogste"
   },
   "inclvat": {
     "en": "Incl. VAT",
     "sv": "Inkl. moms",
-    "de": "Incl. VAT"
+    "de": "Incl. VAT",
+    "nl": "Incl. BTW"
   },
   "exclvat": {
     "en": "Excl. VAT",
     "sv": "Exkl. moms",
-    "de": "Excl. VAT"
+    "de": "Excl. VAT",
+    "nl": "Excl. BTW"
   },
-
   "updated": {
     "en": "Nord Pool ",
     "sv": "Nord Pool ",
-    "de": "Nord Pool "
+    "de": "Nord Pool ",
+    "nl": "Nord Pool "
   }
 }
