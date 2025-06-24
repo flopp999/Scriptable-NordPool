@@ -159,7 +159,7 @@
     "en": "Enter the total extra cost per kWh incl. VAT(e.g. grid fees, taxes, markup) in ",
     "sv": "Skriv in totala extra kostnader per kWh inkl. moms(t.ex. överföringsavgift, skatt) i ",
     "de": "Enter the total extra cost per kWh incl. VAT(e.g. grid fees, taxes, markup) in ",
-    "nl": "Voer de totale extra kosten per kWh in incl. BTW (bijv. netwerkkosten, belastingen, toeslagen) in "
+    "nl": "Voer de totale extra kosten per kWh incl. BTW (bijv. netwerkkosten, belastingen, toeslagen) in "
   },
   "extraelectricitycost": {
     "en": "Extra Electricity Cost",
