@@ -4,7 +4,7 @@
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
-let version = 0.791
+let version = 0.792
 let allValues = [];
 let widget;
 let daybefore;
@@ -303,15 +303,16 @@ async function askForAllShowPositions() {
 // Select resolution
 async function askForLanguage() {
   let alert = new Alert();
-  alert.message = "Language/Sprache/Språk:";
+  alert.message = "Language/Sprache/Språk/Taal:";
   alert.addAction("English");
   alert.addAction("Deutsch");
   alert.addAction("Svenska");
+  alert.addAction("Nederlands");
   let index = await alert.presentAlert();
-  settings.language = [1,2,3][index];
+  settings.language = [1,2,3,4][index];
   fm.writeString(filePathSettings, JSON.stringify(settings, null, 2)); // Pretty print
   langId = settings.language; // 1 = ENG, 2 = DE, 3 = SV
-  return [1,2,3][index];
+  return [1,2,3,4][index];
 }
 
 // Select area
