@@ -41,10 +41,9 @@ Download Scriptable here:
 
 1. Go to the latest version of the script:  
    👉 [Download Nordpool.scriptable](https://github.com/flopp999/Scriptable-NordPool/releases/download/0.793/Nordpool.scriptable)  
-   and copy the entire content.
-2. Open **Scriptable** and tap the **+** icon in the top right.
-3. Paste the script, then tap **Play** (▶️) to run it.
-4. Follow the setup instructions shown on screen.
+   and open it with **Scriptable**.
+2. Tap **Play** (▶️) to run it.
+3. Follow the setup instructions shown on screen.
 
 ## 🌐 Language Support
 
