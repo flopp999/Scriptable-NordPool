@@ -49,6 +49,7 @@ Download Scriptable here:
 
 - ✅ English  
 - ✅ Swedish  
+- ✅ Dutch
 
 Want support for another language? [Open an issue](https://github.com/flopp999/Scriptable-NordPool/issues) and I’ll add it!
 
