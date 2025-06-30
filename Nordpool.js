@@ -115,7 +115,7 @@ async function updatecode() {
         }
         const codeStringTranslations = responseTranslations.toRawString();
         fm.writeString(filePathTranslations, codeStringTranslations);
-        fm.remove(filePathSettings);
+        //fm.remove(filePathSettings);
         let updateNotify = new Notification();
         updateNotify.title = Script.name();
         updateNotify.body = "New version installed, " + serverVersion;
