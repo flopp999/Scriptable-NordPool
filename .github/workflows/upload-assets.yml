@@ -16,12 +16,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Replace hardcoded URL in Nordpool.js
         run: |
+          export LANG=C.UTF-8
+          export LC_ALL=C.UTF-8
           sed -i 's#https://raw.githubusercontent.com/flopp999/Scriptable-NordPool/main/#https://github.com/flopp999/Scriptable-NordPool/releases/latest/download/#g' Nordpool.js
           sed -i 's#FileManager\.iCloud()#FileManager.local()#g' Nordpool.js
-
+      
       - name: Upload assets to release
         uses: softprops/action-gh-release@v1
         with:
