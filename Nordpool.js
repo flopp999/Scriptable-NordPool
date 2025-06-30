@@ -4,7 +4,7 @@
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
-let version = 0.792
+let version = 0.793
 let allValues = [];
 let widget;
 let daybefore;
@@ -443,6 +443,9 @@ async function Table(day) {
   }
   }
   daybefore = day;
+  if (prices == 0) {
+    return;
+  }
   let head = listwidget.addStack()
   let stackNames = ["first", "second", "third", "fourth", "fifth"];
   let timeStacks = {};
