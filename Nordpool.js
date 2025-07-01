@@ -135,27 +135,26 @@ async function readsettings() {
     if (fm.fileExists(filePathSettings)) {
       let raw = fm.readString(filePathSettings);
       settings = JSON.parse(raw);
-      if (!settings.language || settings.language.length === 0) {
+      if (settings.language !== 1  && settings.language !== 2 && settings.language !== 3 && settings.language !== 4) {
 				await askForLanguage();
 			}
+			langId = settings.language; // 1 = ENG, 2 = DE, 3 = SV
+      await readTranslations();
 			if (!settings.area) {
 				await askForArea();
 			}
-			if (!settings.includevat || settings.includevat.length === 0) {
+			if (settings.includevat !== 0  && settings.includevat !== 1) {
 				await askForIncludeVAT();
 			}
       if (!settings.vat || settings.vat.length === 0) {
 				await askForIncludeVAT();
 			}
-			if (!settings.extras || settings.extras.length === 0) {
+			if (settings.extras !== 0 && settings.extras !== 1) {
 				await askForExtras();
 			}
 			if (!settings.currency || settings.currency.length === 0) {
 				await askForArea();
 			}
-      langId = settings.language; // 1 = ENG, 2 = DE, 3 = SV
-      await readTranslations();
-
     } else {
       if (config.runsInWidget) {
         return;
