@@ -4,7 +4,7 @@
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
-let version = 0.793
+let version = 0.795
 let allValues = [];
 let widget;
 let daybefore;
@@ -135,13 +135,27 @@ async function readsettings() {
     if (fm.fileExists(filePathSettings)) {
       let raw = fm.readString(filePathSettings);
       settings = JSON.parse(raw);
+      if (!settings.language || settings.language.length === 0) {
+				await askForLanguage();
+			}
+			if (!settings.area) {
+				await askForArea();
+			}
+			if (!settings.includevat || settings.includevat.length === 0) {
+				await askForIncludeVAT();
+			}
+      if (!settings.vat || settings.vat.length === 0) {
+				await askForIncludeVAT();
+			}
+			if (!settings.extras || settings.extras.length === 0) {
+				await askForExtras();
+			}
+			if (!settings.currency || settings.currency.length === 0) {
+				await askForArea();
+			}
       langId = settings.language; // 1 = ENG, 2 = DE, 3 = SV
       await readTranslations();
-      keys = Object.keys(settings);
-      if (keys.length < 11) {
-        throw new Error("Settings file is incomplete or corrupted");
-        return;
-      }
+
     } else {
       if (config.runsInWidget) {
         return;
@@ -422,7 +436,7 @@ async function askForExtras() {
 }
 
 async function Table(day) {
-  await Data(day);
+  await nordpoolData(day);
   if (daybefore != day){
   let left = listwidget.addStack();
   let whatday = left.addText(date);
@@ -535,7 +549,7 @@ async function Table(day) {
 
 async function Graph(day, graphOption) {
 //chart
-  await Data(day);
+  await nordpoolData(day);
   if (daybefore != day){ 
     let left = listwidget.addStack();
     let whatday = left.addText(date);
@@ -647,11 +661,11 @@ async function Graph(day, graphOption) {
 }
 
 async function PriceStats(day) {
-  await Data(day);
+  await nordpoolData(day);
   if (daybefore != day){
     let left = listwidget.addStack();
     let whatday = left.
-      addText(date);
+    addText(date);
     whatday.textColor = new Color("#ffffff");
     whatday.font = Font.lightSystemFont(13);
     left.addSpacer();
@@ -662,16 +676,14 @@ async function PriceStats(day) {
   daybefore = day;
   if (prices == 0) {
     return;
-    }
+  }
   let bottom = listwidget.addStack();
   if (day != "tomorrow"){
-  
-  // now
-  let now = bottom.addText(t("now") + " " + Math.round(pricesJSON[hour]));
-  now.font = Font.lightSystemFont(11);
-  now.textColor = new Color("#00ffff");
-  bottom.addSpacer();
-    }
+    let now = bottom.addText(t("now") + " " + Math.round(pricesJSON[hour]));
+    now.font = Font.lightSystemFont(11);
+    now.textColor = new Color("#00ffff");
+    bottom.addSpacer();
+  }
   // lowest
   let lowest = bottom.addText(t("lowest") + " " + Math.round(priceLowest));
   lowest.font = Font.lightSystemFont(11);
@@ -695,7 +707,7 @@ const bigFont = 13.5;
 const hours = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
 
 // Today date
-async function Data(day) {
+async function nordpoolData(day) {
   allValues = [];
   Path = fm.joinPath(dir, "NordPool_" + day + "Prices.json");
   DateObj = new Date();
@@ -727,7 +739,7 @@ async function Data(day) {
     modifiedDay === yesterday.getDate() &&
     modifiedMonth === yesterday.getMonth() &&
     modifiedYear === yesterday.getFullYear();
-    if (hoursDiff > 6 || isFromYesterday) {
+    if (hoursDiff > 6 || hour == 13 || isFromYesterday) {
       await getData();
     }
   } else {
@@ -752,66 +764,11 @@ async function Data(day) {
   priceAvg = pricesJSON.map(Number).reduce((a, b) => a + b, 0) / pricesJSON.length;
 }
 
-// Tomorrow date
-async function DateTomorrow() { 
-  allValues = [];
-  tomorrowPath = fm.joinPath(dir, "NordPool_TomorrowPrices.json");
-  async function getTomorrowData() {
-    const tomorrowDateObj = new Date();
-    tomorrowDateObj.setDate(tomorrowDateObj.getDate() + 1);
-    const yyyyTomorrow = tomorrowDateObj.getFullYear();
-    const mmTomorrow = String(tomorrowDateObj.getMonth() + 1).padStart(2, '0');
-    const ddTomorrow = String(tomorrowDateObj.getDate()).padStart(2, '0');
-    const tomorrowStr = `${yyyyTomorrow}-${mmTomorrow}-${ddTomorrow}`;
-    const tomorrowUrl = `https://dataportal-api.nordpoolgroup.com/api/DayAheadPriceIndices?date=${tomorrowStr}&market=DayAhead&indexNames=${area}&currency=${currency}&resolutionInMinutes=${resolution}`;
-    const requestTomorrow = new Request(tomorrowUrl);
-    requestTomorrow.timeoutInterval = 1;
-    let responseTomorrow = (await requestTomorrow.loadJSON());
-    const tomorrowJSON = JSON.stringify(responseTomorrow, null ,2);
-    fm.writeString(tomorrowPath, tomorrowJSON);
-  }
-  if (fm.fileExists(tomorrowPath)) {
-    let modified = fm.modificationDate(tomorrowPath);
-    let now = new Date();
-    let hoursDiff = (now - modified) / (1000 * 60 * 60);
-    let modifiedDay = modified.getDate();
-    let modifiedMonth = modified.getMonth();
-    let modifiedYear = modified.getFullYear();
-    let yesterday = new Date(now);
-    yesterday.setDate(now.getDate() - 1);
-    let isFromYesterday =
-    modifiedDay === yesterday.getDate() &&
-    modifiedMonth === yesterday.getMonth() &&
-    modifiedYear === yesterday.getFullYear();
-  
-    if (hoursDiff > 6 || isFromYesterday) {
-      await getTomorrowData();
-    }
-  } else {
-    await getTomorrowData();
-  }
-  let content = fm.readString(tomorrowPath);
-  responseTomorrow = JSON.parse(content);
-  date = responseTomorrow.deliveryDateCET;  
-  prices = responseTomorrow.multiIndexEntries;
-  let tomorrowUpdated = responseTomorrow.updatedAt;
-  updated = tomorrowUpdated.replace(/\.\d+Z$/, '').replace('T', ' ');
-  for (let i = 0; i < prices.length; i++) {
-    const value = prices[i]["entryPerArea"][`${area}`];
-    allValues.push(String(value/10* (1 + "." + (includevat*vat)) + extras));
-  }
-  pricesJSON = JSON.parse(JSON.stringify(allValues));
-  priceLowest = (Math.min(...pricesJSON.map(Number)));
-  priceHighest = (Math.max(...pricesJSON.map(Number)));
-  priceDiff = (priceHighest - priceLowest)/3;
-  priceAvg = pricesJSON.map(Number).reduce((a, b) => a + b, 0) / pricesJSON.length;
-}
-
 async function renderSection(position) {
   const value = settings[`showat${position}`];
-
-  if (!value || value === "nothing") return;
-
+  if (!value || value === "nothing") {
+    return;
+  }
   const [type, day] = value.split(",").map(s => s.trim());
   const graphOption = settings.graphOption[position]
   switch (type) {
