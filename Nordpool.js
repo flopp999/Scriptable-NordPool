@@ -4,7 +4,7 @@
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
-let version = 0.796
+let version = 0.797
 let allValues = [];
 let widget;
 let daybefore;
@@ -556,7 +556,7 @@ async function Graph(day, graphOption) {
     whatday.font = Font.lightSystemFont(13);
     left.addSpacer();
     if (prices == 0) {
-      whatday = left.addText("Available after 13:00");
+      whatday = left.addText(t("after13"));
       whatday.textColor = new Color("#ffffff");
       whatday.font = Font.lightSystemFont(13);
       listwidget.addSpacer(5);
@@ -668,10 +668,19 @@ async function PriceStats(day) {
     whatday.textColor = new Color("#ffffff");
     whatday.font = Font.lightSystemFont(13);
     left.addSpacer();
-    let updatetext = left.addText(t("updated") + updated);
-    updatetext.font = Font.lightSystemFont(13);
-    updatetext.textColor = new Color("#ffffff");
-  }
+		if (prices == 0) {
+      whatday = left.addText(t("after13"));
+      whatday.textColor = new Color("#ffffff");
+      whatday.font = Font.lightSystemFont(13);
+      listwidget.addSpacer(5);
+      daybefore = day;
+      return;
+    } else {
+      let updatetext = left.addText(t("updated") + updated);
+      updatetext.font = Font.lightSystemFont(13);
+      updatetext.textColor = new Color("#ffffff");
+  	}
+	}
   daybefore = day;
   if (prices == 0) {
     return;
