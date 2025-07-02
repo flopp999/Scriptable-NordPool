@@ -4,7 +4,7 @@
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
-let version = 0.795
+let version = 0.796
 let allValues = [];
 let widget;
 let daybefore;
@@ -437,23 +437,23 @@ async function askForExtras() {
 async function Table(day) {
   await nordpoolData(day);
   if (daybefore != day){
-  let left = listwidget.addStack();
-  let whatday = left.addText(date);
-  whatday.textColor = new Color("#ffffff");
-  whatday.font = Font.lightSystemFont(13);
-  left.addSpacer();
-  if (prices == 0) {
-    whatday = left.addText(t("after13"));
-    whatday.textColor = new Color("#ffffff");
-    whatday.font = Font.lightSystemFont(13);
-    listwidget.addSpacer(5);
-    return;
-  }else{
-  
-  let updatetext = left.addText(t("updated") + updated);
-  updatetext.font = Font.lightSystemFont(13);
-  updatetext.textColor = new Color("#ffffff");
-  }
+		daybefore = day;
+	  let left = listwidget.addStack();
+	  let whatday = left.addText(date);
+	  whatday.textColor = new Color("#ffffff");
+	  whatday.font = Font.lightSystemFont(13);
+	  left.addSpacer();
+	  if (prices == 0) {
+	    whatday = left.addText(t("after13"));
+	    whatday.textColor = new Color("#ffffff");
+	    whatday.font = Font.lightSystemFont(13);
+	    listwidget.addSpacer(5);
+	    return;
+	  } else {
+	  	let updatetext = left.addText(t("updated") + updated);
+	  	updatetext.font = Font.lightSystemFont(13);
+	  	updatetext.textColor = new Color("#ffffff");
+	  }
   }
   daybefore = day;
   if (prices == 0) {
