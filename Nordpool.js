@@ -4,7 +4,7 @@
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
-let version = 0.797
+let version = 0.798
 let allValues = [];
 let widget;
 let daybefore;
@@ -433,7 +433,12 @@ async function Table(day) {
   if (daybefore != day){
 		daybefore = day;
 	  let left = listwidget.addStack();
-	  let whatday = left.addText(date);
+	  let whatday
+		if (date == todaydate) {
+			whatday = left.addText(t("today"));
+		} else {
+			whatday = left.addText(date);
+		}
 	  whatday.textColor = new Color("#ffffff");
 	  whatday.font = Font.lightSystemFont(13);
 	  left.addSpacer();
@@ -545,7 +550,12 @@ async function Graph(day, graphOption) {
   await nordpoolData(day);
   if (daybefore != day){ 
     let left = listwidget.addStack();
-    let whatday = left.addText(date);
+	  let whatday
+		if (date == todaydate) {
+			whatday = left.addText(t("today"));
+		} else {
+			whatday = left.addText(date);
+		}
     whatday.textColor = new Color("#ffffff");
     whatday.font = Font.lightSystemFont(13);
     left.addSpacer();
@@ -657,8 +667,12 @@ async function PriceStats(day) {
   await nordpoolData(day);
   if (daybefore != day){
     let left = listwidget.addStack();
-    let whatday = left.
-    addText(date);
+	  let whatday
+		if (date == todaydate) {
+			whatday = left.addText(t("today"));
+		} else {
+			whatday = left.addText(date);
+		}
     whatday.textColor = new Color("#ffffff");
     whatday.font = Font.lightSystemFont(13);
     left.addSpacer();
@@ -707,6 +721,11 @@ const smallFont = 10;
 const mediumFont = 12;
 const bigFont = 13.5;
 const hours = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+const now = new Date();
+const yyyy = now.getFullYear();
+const mm = String(now.getMonth() + 1).padStart(2, '0');
+const dd = String(now.getDate()).padStart(2, '0');
+todaydate = `${yyyy}-${mm}-${dd}`;
 
 async function nordpoolData(day) {
   allValues = [];
