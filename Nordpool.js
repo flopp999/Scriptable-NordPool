@@ -4,7 +4,7 @@
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
-let version = 0.799
+let version = 0.800
 let allValues = [];
 let widget;
 let daybefore;
@@ -49,16 +49,7 @@ if (!config.runsInWidget){
 }
 
 if (config.runsInWidget){
- await readsettings();
-  if (keys.length < 11 || keys == undefined) {
-    let widget = new ListWidget();
-    widget.addText("You need to run \"" + Script.name() + "\" in the app");
-    Script.setWidget(widget);
-    Script.complete();
-    return;
-  }
-}
-if (config.runsInWidget){
+  await readsettings();
   await updatecode();
   await createVariables();
 }
