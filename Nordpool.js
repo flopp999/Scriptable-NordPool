@@ -85,7 +85,7 @@ async function start() {
   let index = await alert.presentAlert();
   if (index === 0) {
     settings = await ask();
-    fm.writeString(filePathSettings, JSON.stringify(settings, null, 2)); // Pretty print
+    fm.writeString(filePathSettings, JSON.stringify(settings, null, 2));
   }
 }
 
@@ -178,7 +178,7 @@ async function readsettings() {
     }
     console.warn("Settings file not found or error reading file: " + error.message);
     settings = await ask();
-    fm.writeString(filePathSettings, JSON.stringify(settings, null, 2)); // Pretty print
+    fm.writeString(filePathSettings, JSON.stringify(settings, null, 2));
   }
 }
 
@@ -312,8 +312,6 @@ async function askForAllShowPositions() {
   return settings;
   }
 
-
-// Select resolution
 async function askForLanguage() {
   let alert = new Alert();
   alert.message = "Language/Sprache/Språk/Taal:";
@@ -323,12 +321,11 @@ async function askForLanguage() {
   alert.addAction("Nederlands");
   let index = await alert.presentAlert();
   settings.language = [1,2,3,4][index];
-  fm.writeString(filePathSettings, JSON.stringify(settings, null, 2)); // Pretty print
+  fm.writeString(filePathSettings, JSON.stringify(settings, null, 2));
   langId = settings.language; // 1 = ENG, 2 = DE, 3 = SV
   return [1,2,3,4][index];
 }
 
-// Select area
 async function askForArea() {
   let alert = new Alert();
   alert.message = t("chooseyourelectricityarea") + ":";
@@ -400,7 +397,6 @@ async function askForArea() {
   return [area, vat, currencies2];
 }
 
-// Select resolution
 async function askForResolution() {
   let alert = new Alert();
   alert.message = t("choosedataresolution") + ":";
@@ -410,7 +406,6 @@ async function askForResolution() {
   return [15, 60][index];
 }
 
-// Include VAT?
 async function askForIncludeVAT() {
   let alert = new Alert();
   alert.message = t("doyouwantvat") + "?";
@@ -420,7 +415,6 @@ async function askForIncludeVAT() {
   return [1,0][index];
 }
 
-// Include extra cost?
 async function askForExtras() {
   let alert = new Alert();
   alert.title = t("extraelectricitycost");
@@ -714,7 +708,6 @@ const mediumFont = 12;
 const bigFont = 13.5;
 const hours = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
 
-// Today date
 async function nordpoolData(day) {
   allValues = [];
   Path = fm.joinPath(dir, "NordPool_" + day + "Prices.json");
