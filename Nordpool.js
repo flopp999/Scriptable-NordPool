@@ -4,7 +4,7 @@
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
-let version = 0.798
+let version = 0.799
 let allValues = [];
 let widget;
 let daybefore;
@@ -436,7 +436,9 @@ async function Table(day) {
 	  let whatday
 		if (date == todaydate) {
 			whatday = left.addText(t("today"));
-		} else {
+		} else if (date == tomorrowdate) {
+			whatday = left.addText(t("tomorrow"));
+    } else {
 			whatday = left.addText(date);
 		}
 	  whatday.textColor = new Color("#ffffff");
@@ -553,7 +555,9 @@ async function Graph(day, graphOption) {
 	  let whatday
 		if (date == todaydate) {
 			whatday = left.addText(t("today"));
-		} else {
+		} else if (date == tomorrowdate) {
+			whatday = left.addText(t("tomorrow"));
+    } else {
 			whatday = left.addText(date);
 		}
     whatday.textColor = new Color("#ffffff");
@@ -670,7 +674,9 @@ async function PriceStats(day) {
 	  let whatday
 		if (date == todaydate) {
 			whatday = left.addText(t("today"));
-		} else {
+		} else if (date == tomorrowdate) {
+			whatday = left.addText(t("tomorrow"));
+    } else {
 			whatday = left.addText(date);
 		}
     whatday.textColor = new Color("#ffffff");
@@ -726,6 +732,8 @@ const yyyy = now.getFullYear();
 const mm = String(now.getMonth() + 1).padStart(2, '0');
 const dd = String(now.getDate()).padStart(2, '0');
 todaydate = `${yyyy}-${mm}-${dd}`;
+const ddtomorrow = String(now.getDate() + 1).padStart(2, '0');
+tomorrowdate = `${yyyy}-${mm}-${ddtomorrow}`;
 
 async function nordpoolData(day) {
   allValues = [];
