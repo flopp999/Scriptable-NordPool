@@ -1,4 +1,10 @@
 {
+  "doyouwanthighlow" {
+    "en": "Do you want to receive a notification when the hour with the highest and lowest price begins?",
+    "sv": "Vill du få en notis när timmen med högsta och lägsta pris börjar?",
+    "de": "Möchtest du eine Benachrichtigung erhalten, wenn die Stunde mit dem höchsten und niedrigsten Preis beginnt?",
+    "nl": "Wil je een melding ontvangen wanneer het uur met de hoogste en laagste prijs begint?"
+  },
   "after13": {
     "en": "Available after 13:00",
     "sv": "Tillgängligt efter 13:00",
