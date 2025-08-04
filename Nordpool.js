@@ -4,7 +4,10 @@
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
-let version = 0.800
+let version = 0.805
+let notificationSet;
+let highTime;
+let lowTime;
 let allValues = [];
 let widget;
 let daybefore;
@@ -137,6 +140,15 @@ async function readsettings() {
 			if (settings.includevat !== 0  && settings.includevat !== 1) {
 				await askForIncludeVAT();
 			}
+      if (settings.highlow !== 0 && settings.highlow !== 1) {
+				await askForHighLow();
+			}
+      if (settings.notificationSet !== 0 && settings.notificationSet !== 1) {
+				settings.notificationSet = 0;
+			}
+      if (settings.notificationSetTomorrow !== 0 && settings.notificationSetTomorrow !== 1) {
+				settings.notificationSetTomorrow = 0;
+			}	
       if (!settings.vat || settings.vat.length === 0) {
 				await askForIncludeVAT();
 			}
@@ -215,6 +227,7 @@ async function ask() {
   settings.includevat = await askForIncludeVAT();
   settings.extras = await askForExtras();
   await askForAllShowPositions("top");
+	await askForHighLow();
   settings.resolution = 60;
   return settings
 }
@@ -403,6 +416,18 @@ async function askForIncludeVAT() {
   alert.addAction(t("withvat"));
   alert.addAction(t("withoutvat"));
   let index = await alert.presentAlert();
+  return [1,0][index];
+}
+
+async function askForHighLow() {
+  let alert = new Alert();
+  alert.message = t("doyouwanthighlow") + "?";
+  alert.addAction(t("yes"));
+  alert.addAction(t("no"));
+  let index = await alert.presentAlert();
+  settings.highlow = [1,0][index];
+  settings.notificationSet = 0;
+  fm.writeString(filePathSettings, JSON.stringify(settings, null, 2));
   return [1,0][index];
 }
 
@@ -733,6 +758,9 @@ async function nordpoolData(day) {
   async function getData() {
     if (day == "tomorrow") {
       DateObj.setDate(DateObj.getDate() + 1);
+			settings.notificationSetTomorrow = 0;
+    } else {
+      settings.notificationSet = 0;
     }
     const yyyy = DateObj.getFullYear();
     const mm = String(DateObj.getMonth() + 1).padStart(2, '0');
@@ -781,6 +809,57 @@ async function nordpoolData(day) {
   priceHighest = (Math.max(...pricesJSON.map(Number)));
   priceDiff = (priceHighest - priceLowest)/3;
   priceAvg = pricesJSON.map(Number).reduce((a, b) => a + b, 0) / pricesJSON.length;
+	  highTime = pricesJSON.map(Number).indexOf(priceHighest)
+  lowTime = pricesJSON.map(Number).indexOf(priceLowest)
+  //log(Notification.allPending())
+  if (prices != 0 && settings.highlow == 1)  {
+   //log("set")
+     //let pending = await Notification.allPending()
+    //console.log(pending)
+    await setNotification(day);
+  }
+}
+
+async function setNotification(day) {
+//log("message")
+//let pending = await Notification.allPending()
+//console.log(pending)
+//await Notification.removeAllDelivered()
+await Notification.removeAllPending()
+//log(settings)
+let today = new Date()
+if (day == "tomorrow" && settings.notificationSetTomorrow == 0) {
+  let highnot = new Notification()
+  highnot.title = "Högsta elpriset"
+  highnot.body = `Elpriset är som högst klockan ${highTime}, ${Math.round(priceHighest)} öre/kWh)`
+  highnot.sound = "default"
+  await highnot.schedule()
+
+  let lownot = new Notification()
+  lownot.title = "Lägsta elpriset"
+  lownot.body = `Elpriset är som lägst klockan ${lowTime}, ${Math.round(priceLowest)} öre/kWh)`
+  lownot.sound = "default"
+  await lownot.schedule()
+  settings.notificationSetTomorrow = 1
+
+} else if (settings.notificationSet == 0) {
+  let highnot = new Notification()
+  highnot.title = "Högsta elpriset"
+  highnot.body = `Elpriset är som högst nu, ${Math.round(priceHighest)} öre/kWh)`
+  highnot.sound = "default"
+  highnot.setTriggerDate(new Date(today.getFullYear(), today.getMonth(), today.getDate(), highTime,00))
+  await highnot.schedule()
+
+  let lownot = new Notification()
+  lownot.title = "Lägsta elpriset"
+  lownot.body = `Elpriset är som lägst nu, ${Math.round(priceLowest)} öre/kWh)`
+  lownot.sound = "default"
+  lownot.setTriggerDate(new Date(today.getFullYear(), today.getMonth(), today.getDate(), lowTime,00))
+  await lownot.schedule()
+  settings.notificationSet = 1
+
+}
+fm.writeString(filePathSettings, JSON.stringify(settings, null, 2));
 }
 
 async function renderSection(position) {
