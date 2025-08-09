@@ -4,7 +4,7 @@
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
-let version = 0.805
+let version = 0.806
 let notificationSet;
 let highTime;
 let lowTime;
@@ -792,6 +792,7 @@ async function nordpoolData(day) {
   } else {
     await getData();
   }
+  await getData();
   hour = DateObj.getHours();
   minute = DateObj.getMinutes();
   let content = fm.readString(Path);
@@ -825,7 +826,7 @@ async function setNotification(day) {
 //let pending = await Notification.allPending()
 //console.log(pending)
 //await Notification.removeAllDelivered()
-await Notification.removeAllPending()
+//await Notification.removeAllPending()
 //log(settings)
 let today = new Date()
 if (day == "tomorrow" && settings.notificationSetTomorrow == 0) {
