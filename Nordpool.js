@@ -4,7 +4,7 @@
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
-let version = 0.806
+let version = 0.810
 let notificationSet;
 let highTime;
 let lowTime;
@@ -41,13 +41,33 @@ const filePathTranslations = fm.joinPath(dir, fileNameTranslations);
 let height = 1150;
 let width = 1300;
 let keys = [];
-
+let internet = false;
+//async function harInternet() {
+  try {
+    let req = new Request("https://www.apple.com/library/test/success.html");
+    req.method = "HEAD";
+    req.timeoutInterval = 5;
+    await req.load();
+    internet = true;
+  } catch (error) {
+    internet = false;
+  }
+//}
+log(internet)
 if (!config.runsInWidget){
-  await updatecode();
+  if (internet == true) {await updatecode();
+  log("2344")
+  }
+  if (internet == true) {
   await readTranslations();
+  }
+  //if (internet == true) {
   await readsettings();
+  //}
   await createVariables();
+  log("57")
   await start();
+  log("98")
   await createVariables();
 }
 
@@ -140,6 +160,12 @@ async function readsettings() {
 			if (settings.includevat !== 0  && settings.includevat !== 1) {
 				await askForIncludeVAT();
 			}
+	if (!settings.vat || settings.vat.length === 0) {
+				await askForIncludeVAT();
+			}
+	if (settings.extras !== 0 && settings.extras !== 1) {
+				await askForExtras();
+			}
       if (settings.highlow !== 0 && settings.highlow !== 1) {
 				await askForHighLow();
 			}
@@ -149,12 +175,7 @@ async function readsettings() {
       if (settings.notificationSetTomorrow !== 0 && settings.notificationSetTomorrow !== 1) {
 				settings.notificationSetTomorrow = 0;
 			}	
-      if (!settings.vat || settings.vat.length === 0) {
-				await askForIncludeVAT();
-			}
-			if (settings.extras !== 0 && settings.extras !== 1) {
-				await askForExtras();
-			}
+
 			if (!settings.currency || settings.currency.length === 0) {
 				await askForArea();
 			}
@@ -227,7 +248,7 @@ async function ask() {
   settings.includevat = await askForIncludeVAT();
   settings.extras = await askForExtras();
   await askForAllShowPositions("top");
-	await askForHighLow();
+  await askForHighLow();
   settings.resolution = 60;
   return settings
 }
@@ -235,7 +256,7 @@ async function ask() {
 async function askForAllShowPositions() {
   const options = ["graph", "table", "pricestats", "nothing"];
   const days = ["today", "tomorrow"];
-  const graphTypes = ["line", "bar"];
+  //const graphTypes = ["line", "bar"];
   const chosenCombinations = [];
   const positions = ["top", "middle", "bottom"];
   const graphOption = {};
@@ -260,15 +281,7 @@ async function askForAllShowPositions() {
     const choice = filteredOptions[index];
 
     let day = "";
-    if (choice === "graph") {
-      const graphTypeAlert = new Alert();
-      graphTypeAlert.title = t(position).charAt(0).toUpperCase() + t(position).slice(1);
-      graphTypeAlert.message = t("choosegraphtype");
-      graphTypes.forEach(g => graphTypeAlert.addAction(t(g)));
-      const gIndex = await graphTypeAlert.presentAlert();
-      const selectedGraphType = graphTypes[gIndex];
-      graphOption[position] = selectedGraphType;
-    }
+    
     if (choice !== "nothing") {
       const usedDaysForType = chosenCombinations
         .filter(c => c.type === choice)
@@ -445,7 +458,9 @@ async function askForExtras() {
 }
 
 async function Table(day) {
-  await nordpoolData(day);
+  if (size == "small") {return};
+  if (internet == true) {await nordpoolData(day);
+  }
   if (daybefore != day){
 		daybefore = day;
 	  let left = listwidget.addStack();
@@ -471,6 +486,9 @@ async function Table(day) {
 	  	updatetext.font = Font.lightSystemFont(13);
 	  	updatetext.textColor = new Color("#ffffff");
 	  }
+  }
+  if (size == "medium"){
+  listwidget.addSpacer(3)
   }
   daybefore = day;
   if (prices == 0) {
@@ -566,7 +584,7 @@ async function Table(day) {
 async function Graph(day, graphOption) {
 //chart
   await nordpoolData(day);
-  if (daybefore != day){ 
+  if (daybefore != day && size != "small"){ 
     let left = listwidget.addStack();
 	  let whatday
 		if (date == todaydate) {
@@ -592,7 +610,9 @@ async function Graph(day, graphOption) {
       updatetext.textColor = new Color("#ffffff");
     }
   }
+  log("message")
   daybefore = day;
+  //listwidget.addSpacer(13)
   if (resolution == 60) {
     let avgtoday = []
     let dotNow = ""
@@ -615,7 +635,6 @@ async function Graph(day, graphOption) {
       counterdot += 1
     }
     while (counterdot < 24)
-    
     let graphtoday = "https://quickchart.io/chart?bkg=black&w=1300&h="+settings.height+"&c="
     graphtoday += encodeURI("{\
       data: { \
@@ -647,7 +666,7 @@ async function Graph(day, graphOption) {
           },\
           {\
             data: ["+pricesJSON+"],\
-            type: '"+graphOption+"',\
+            type: 'line',\
             fill: false,\
             borderColor: getGradientFillHelper('vertical',['rgb(255,25,255)','rgb(255,48,8)','orange','rgb(255,255,0)','rgb(0,150,0)']),\
             borderWidth: 20, \
@@ -673,10 +692,12 @@ async function Graph(day, graphOption) {
             }\
           }\
     }")
-    graphtoday.timeoutInterval = 1;
+    graphtoday.timeoutInterval = 10;
     const GRAPH = await new Request(graphtoday).loadImage()
-    let emptyrow = listwidget.addStack()
-    listwidget.addSpacer(5)
+    log(":33")
+    //let emptyrow = listwidget.addStack()
+    
+    //listwidget.addSpacer(5)
     let chart = listwidget.addStack()
     chart.addImage(GRAPH) 
   }
@@ -684,7 +705,9 @@ async function Graph(day, graphOption) {
 }
 
 async function PriceStats(day) {
+  if (internet == true) {
   await nordpoolData(day);
+  }
   if (daybefore != day){
     let left = listwidget.addStack();
 	  let whatday
@@ -726,9 +749,23 @@ async function PriceStats(day) {
   let lowest = bottom.addText(t("lowest") + " " + Math.round(priceLowest));
   lowest.font = Font.lightSystemFont(11);
   lowest.textColor = new Color("#00cf00");
-  bottom.addSpacer();
+  //bottom.addSpacer();
   // average
-  let avg = bottom.addText(t("average") + " " + Math.round(priceAvg));
+
+  if (size == "small") {
+    let yh = listwidget.addStack()
+    let avg = yh.addText(t("average") + " " + Math.round(priceAvg));
+    avg.font = Font.lightSystemFont(11);
+    avg.textColor = new Color("#f38");
+    yh.addSpacer();
+  // highest
+    let highest = yh.addText(t("highest") + " " + Math.round(priceHighest));
+    highest.font = Font.lightSystemFont(11);
+    highest.textColor = new Color("#fa60ff");
+  }
+  else {
+    bottom.addSpacer();
+    let avg = bottom.addText(t("average") + " " + Math.round(priceAvg));
   avg.font = Font.lightSystemFont(11);
   avg.textColor = new Color("#f38");
   bottom.addSpacer();
@@ -736,6 +773,7 @@ async function PriceStats(day) {
   let highest = bottom.addText(t("highest") + " " + Math.round(priceHighest));
   highest.font = Font.lightSystemFont(11);
   highest.textColor = new Color("#fa60ff");
+  }
   listwidget.addSpacer(5);
 }
 
@@ -747,6 +785,7 @@ const now = new Date();
 const yyyy = now.getFullYear();
 const mm = String(now.getMonth() + 1).padStart(2, '0');
 const dd = String(now.getDate()).padStart(2, '0');
+date = `${yyyy}-${mm}-${dd}`;
 todaydate = `${yyyy}-${mm}-${dd}`;
 const ddtomorrow = String(now.getDate() + 1).padStart(2, '0');
 tomorrowdate = `${yyyy}-${mm}-${ddtomorrow}`;
@@ -760,6 +799,7 @@ async function nordpoolData(day) {
       DateObj.setDate(DateObj.getDate() + 1);
 			settings.notificationSetTomorrow = 0;
     } else {
+      log("bot")
       settings.notificationSet = 0;
     }
     const yyyy = DateObj.getFullYear();
@@ -826,7 +866,7 @@ async function setNotification(day) {
 //let pending = await Notification.allPending()
 //console.log(pending)
 //await Notification.removeAllDelivered()
-//await Notification.removeAllPending()
+await Notification.removeAllPending()
 //log(settings)
 let today = new Date()
 if (day == "tomorrow" && settings.notificationSetTomorrow == 0) {
@@ -885,9 +925,10 @@ async function renderSection(position) {
 }
 
 let listwidget = new ListWidget();
+listwidget.backgroundColor = new Color("#000000");
 
-async function createWidget(){
-  listwidget.backgroundColor = new Color("#000000");
+async function createWidgetLarge(){
+  //listwidget.backgroundColor = new Color("#000000");
   await renderSection("top");
   await renderSection("middle");
   await renderSection("bottom");  
@@ -915,23 +956,272 @@ async function createWidget(){
   return listwidget
 }
 
-widget = await createWidget();
+//widget = await createWidget();
 
-if (config.runsInWidget) {
-  Script.setWidget(widget);
-} else {
-  if (Math.random() < 0.5) {
+// if (config.runsInWidget) {
+//   Script.setWidget(widget);
+// } else {
+//   if (Math.random() < 0.5) {
+//     let alert = new Alert();
+//     alert.title = "Support";
+//     alert.message = t("buymeacoffee") + "?";
+//     alert.addCancelAction(t("ofcourse"));
+//     alert.addAction(t("noway"));
+//     let response = await alert.present();
+//     if (response === -1) {
+//       Safari.open("https://buymeacoffee.com/flopp999");
+//     }
+  //}
+//}
+
+// === EXEMPELFUNKTIONER ===
+async function createWidgetSmall() {
+  settings.height = 620;
+  if (internet == true) { await renderSection("top");}
+  await renderSection("middle");
+  await renderSection("bottom");let moms = listwidget.addStack();
+  momstext = moms.addText("v. " + version);
+  momstext.font = Font.lightSystemFont(10);
+  momstext.textColor = new Color("#ffffff");
+  moms.addSpacer();
+  momstext = moms.addText(area);
+  momstext.font = Font.lightSystemFont(10);
+  momstext.textColor = new Color("#ffffff");
+  //moms.addSpacer();
+  let moms2 = listwidget.addStack();
+  
+  momstext = moms2.addText("Extras: " + extras);
+  momstext.font = Font.lightSystemFont(10);
+  momstext.textColor = new Color("#ffffff");
+  moms2.addSpacer();
+  if (includevat == 1) {
+    momstext = moms2.addText(t("inclvat"));
+  }
+  else {
+    momstext = moms2.addText(t("exclvat"));
+  }
+  momstext.font = Font.lightSystemFont(10);
+  momstext.textColor = new Color("#ffffff");
+
+  return listwidget
+} 
+
+async function createWidgetMedium() {
+  settings.height = 290
+  //listwidget.addSpacer(15)
+  //await renderSection("top");
+  await renderSection("middle");
+  await renderSection("bottom");  
+  let moms = listwidget.addStack();
+  momstext = moms.addText("v. " + version);
+  momstext.font = Font.lightSystemFont(10);
+  momstext.textColor = new Color("#ffffff");
+  moms.addSpacer(120);
+  momstext = moms.addText(area);
+  momstext.font = Font.lightSystemFont(10);
+  momstext.textColor = new Color("#ffffff");
+  moms.addSpacer();
+  momstext = moms.addText("Extras: " + extras);
+  momstext.font = Font.lightSystemFont(10);
+  momstext.textColor = new Color("#ffffff");
+  moms.addSpacer();
+  if (includevat == 1) {
+    momstext = moms.addText(t("inclvat"));
+  }
+  else {
+    momstext = moms.addText(t("exclvat"));
+  }
+  momstext.font = Font.lightSystemFont(10);
+  momstext.textColor = new Color("#ffffff");
+  return listwidget
+}
+
+async function createWidgetAccessoryCircular() {
+  await nordpoolData(day)
+  
+  let moms = listwidget.addStack();
+  moms.layoutVertically()
+  //moms.centerAlignContent()
+  
+  //let moms2 = moms.addStack();
+  //moms2.layoutHorizontally()
+  //moms2.centerAlignContent()
+  
+  let momstext = moms.addText(String(Math.round(pricesJSON[hour])));
+  //momstext.centerAlignText()
+  momstext.font = Font.lightSystemFont(14);
+  //let momstext2 = moms.addText(String(Math.round(pricesJSON[hour])));
+  //momstext2.centerAlignText()
+  //momstext2.font = Font.lightSystemFont(11);
+  
+  //let moms67 = moms.addStack(); 
+  //moms67.layoutHorizontally()
+  
+  let momstex = moms.addText(String(Math.round(priceLowest)));
+  //momstex.centerAlignText()
+  momstex.font = Font.lightSystemFont(14);
+  //let momste = moms.addText(String(Math.round(priceLowest)));
+  //momste.centerAlignText()
+  //momste.font = Font.lightSystemFont(11);
+  
+  //let moms3 = moms.addStack();
+  //moms3.layoutHorizontally()
+  //moms3.centerAlignContent()
+  
+  //let momstext3 = moms.addText(t("average") + Math.round(priceAvg));
+  //momstext3.centerAlignText()
+  //momstext3.font = Font.lightSystemFont(11);
+  //let momstext23 = moms.addText(String(Math.round(priceAvg)));
+  //momstext23.centerAlignText()
+  //momstext23.font = Font.lightSystemFont(11);
+  
+  let moms6 = listwidget.addStack();
+  //moms6.layoutHorizontally()
+  
+  let momstextu = moms6.addText(String(Math.round(priceHighest)));
+  //momstextu.leftAlignText()
+  momstextu.font = Font.lightSystemFont(14);
+  //let momstext2u = moms.addText(String(Math.round(priceHighest)));
+  //momstext2u.centerAlignText()
+  //momstext2u.font = Font.lightSystemFont(11);
+  
+  listwidget.addAccessoryWidgetBackground = true
+  return listwidget
+}
+
+async function createWidgetAccessoryInline() {
+  await nordpoolData(day)
+  
+  let moms = listwidget.addStack();
+  //moms.layoutVertically()
+  //moms.centerAlignContent()
+  
+  //let moms2 = moms.addStack();
+  //moms2.layoutHorizontally()
+  //moms2.centerAlignContent()
+  
+  let momstext = moms.addText("nu "+ Math.round(pricesJSON[hour]));
+  momstext.centerAlignText()
+  momstext.font = Font.lightSystemFont(11);
+  //let momstext2 = moms.addText(String(Math.round(pricesJSON[hour])));
+  //momstext2.centerAlignText()
+  //momstext2.font = Font.lightSystemFont(11);
+  
+  //let moms67 = moms.addStack();
+  //moms67.layoutHorizontally()
+  
+  //let momstex = moms67.addText("lägsta ");
+  //momstextu.centerAlignText()
+  //momstex.font = Font.lightSystemFont(11);
+  //let momste = moms67.addText(String(Math.round(priceLowest)));
+  //momstext2u.centerAlignText()
+  //momste.font = Font.lightSystemFont(11);
+  
+  //let moms3 = moms.addStack();
+  //moms3.layoutHorizontally()
+  //moms3.centerAlignContent()
+  
+  //let momstext3 = moms3.addText("medel ");
+  //momstext3.centerAlignText()
+  //momstext3.font = Font.lightSystemFont(11);
+  //let momstext23 = moms3.addText(String(Math.round(priceAvg)));
+  //momstext23.centerAlignText()
+  //momstext23.font = Font.lightSystemFont(11);
+  
+  //let moms6 = moms.addStack();
+  //moms6.layoutHorizontally()
+  
+  //let momstextu = moms6.addText("högsta ");
+  //momstextu.centerAlignText()
+  //momstextu.font = Font.lightSystemFont(11);
+  //let momstext2u = moms6.addText(String(Math.round(priceHighest)));
+  //momstext2u.centerAlignText()
+  //momstext2u.font = Font.lightSystemFont(11);
+  
+  listwidget.addAccessoryWidgetBackground = true
+  return listwidget
+}
+
+
+// function createWidgetLarge() {
+//   let w = new ListWidget();
+//   w.backgroundColor = new Color("#e67e22");
+//   w.addText("Large widget");
+//   return w;
+// }
+
+// === BESTÄM STORLEK ===
+
+let size = config.widgetFamily;
+
+// Om vi kör i appen (ingen storlek satt) → fråga användaren
+if (!size) {
+  let alert = new Alert();
+  alert.title = "Välj widget-storlek";
+  alert.addAction("Small");
+  alert.addAction("Medium");
+  alert.addAction("Large");
+  alert.addAction("Accessory Circular");
+  alert.addAction("Accessory Rectangular");
+  alert.addAction("Accessory Inline");
+  let response = await alert.presentSheet();
+log(response)
+  // Support-popup ibland
+  if (Math.random() < 0.0) {
     let alert = new Alert();
     alert.title = "Support";
     alert.message = t("buymeacoffee") + "?";
     alert.addCancelAction(t("ofcourse"));
     alert.addAction(t("noway"));
-    let response = await alert.present();
-    if (response === -1) {
+    let resp2 = await alert.present();
+    if (resp2 === -1) {
       Safari.open("https://buymeacoffee.com/flopp999");
     }
   }
+
+  // Sätt storlek beroende på val
+  if (response === 0) size = "small";
+  if (response === 1) size = "medium";
+  if (response === 2) size = "large";
+  if (response === 3) size = "accessoryCircular";
+  if (response === 4) size = "accessoryRectangular";
+  if (response === 5) size = "accessoryInline";
 }
 
-widget.presentLarge()
+// === SKAPA RÄTT WIDGET ===
+log(size)
+switch (size) {
+  case "small":
+    widget = await createWidgetSmall();
+    break;
+  case "medium":
+    widget = await createWidgetMedium();
+    break;
+  case "large":
+    widget = await createWidgetLarge();
+    break;
+  case "accessoryCircular":
+    widget = await createWidgetAccessoryCircular();
+    break;
+  case "accessoryRectangular":
+    widget = await createWidgetAccessoryRectangular();
+    break;
+  case "accessoryInline":
+    widget = await createWidgetAccessoryInline();
+    break;
+}
+
+// === VISA WIDGET ===
+if (!config.runsInWidget) {
+  log(size)
+  if (size === "small") await widget.presentSmall();
+  if (size === "medium") await widget.presentMedium();
+  if (size === "large") await widget.presentLarge();
+  if (size === "accessoryCircular") await widget.presentAccessoryCircular();
+  if (size === "accessoryRectangular") await widget.presentAccessoryRectangular();
+  if (size === "accessoryInline") await widget.presentAccessoryInline();
+} else {
+  Script.setWidget(widget);
+}
+
 Script.complete();
