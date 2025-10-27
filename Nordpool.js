@@ -1,6 +1,3 @@
-// Variables used by Scriptable.
-// These must be at the very top of the file. Do not edit.
-// icon-color: green; icon-glyph: magic;
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
@@ -29,17 +26,19 @@ let language;
 let settings = {}
 let langId;
 let hour;
+let hours;
 let minute;
 let translationData;
 let currentLang;
+let tomorrowdate
 const fileNameSettings = Script.name() + "_Settings.json";
 const fileNameTranslations = Script.name() + "_Translations.json";
 const fm = FileManager.iCloud();
 const dir = fm.documentsDirectory();
 const filePathSettings = fm.joinPath(dir, fileNameSettings);
 const filePathTranslations = fm.joinPath(dir, fileNameTranslations);
-let height = 1150;
-let width = 1300;
+//let height = 1150;
+//let width = 1100;
 let keys = [];
 let internet = false;
 //async function harInternet() {
@@ -53,21 +52,21 @@ let internet = false;
     internet = false;
   }
 //}
-log(internet)
+
 if (!config.runsInWidget){
-  if (internet == true) {await updatecode();
-  log("2344")
+  if (internet == true) {
+    await updatecode();
   }
   if (internet == true) {
-  await readTranslations();
+    await readTranslations();
   }
   //if (internet == true) {
   await readsettings();
   //}
   await createVariables();
-  log("57")
+  
   await start();
-  log("98")
+  
   await createVariables();
 }
 
@@ -79,21 +78,24 @@ if (config.runsInWidget){
 
 async function start() {
   const [topType, topDay] = settings.showattop.split(",").map(s => s.trim());
-  const [middleType, middleDay] = settings.showatmiddle.split(",").map(s => s.trim());
+  //const [middleType, middleDay] = settings.showatmiddle.split(",").map(s => s.trim());
   const [bottomType, bottomDay] = settings.showatbottom.split(",").map(s => s.trim());
   let alert = new Alert();
   let vatText = includevat == 1 ? t("yes") : t("no")
+  let notifyText = settings.highlow == 1 ? t("yes") : t("no")
   alert.message = 
     t("changesetup") + "?\n" +
-    t("top").charAt(0).toUpperCase() + t("top").slice(1) + ":\n" + t(topType) + (topDay ? ", " + t(topDay) : "") + "\n" +
-    t("middle").charAt(0).toUpperCase() + t("middle").slice(1) + ":\n" + t(middleType) + (middleDay ? ", " + t(middleDay) : "") + "\n" +
-    t("bottom").charAt(0).toUpperCase() + t("bottom").slice(1) + ":\n" + t(bottomType) + (bottomDay ? ", " + t(bottomDay) : "") + "\n" +
+    //t("top").charAt(0).toUpperCase() + t("top").slice(1) + ":\n" + 
+    t(topType) + (topDay ? ", " + t(topDay) : "") + "\n" +
+    //t("middle").charAt(0).toUpperCase() + t("middle").slice(1) + ":\n" + t(middleType) + (middleDay ? ", " + t(middleDay) : "") + "\n" +
+    //t("bottom").charAt(0).toUpperCase() + t("bottom").slice(1) + ":\n" + t(bottomType) + (bottomDay ? ", " + t(bottomDay) : "") + "\n" +
     t("area") + ": " + area + "\n" +
     "Extras: " + extras + "\n" +
-    t("withvat") + ": " + vatText + "\n";
-  if (includevat == 1) {
-    alert.message += t("vat") + ": " + vat;
-  }
+    t("withvat") + ": " + vatText +
+    (includevat == 1 ? " (" + vat + "%)" : "") + "\n" +
+    "Notify: " + notifyText;
+    
+
   alert.addAction(t("yes"));
   alert.addAction(t("no"));
   let index = await alert.presentAlert();
@@ -119,7 +121,6 @@ async function updatecode() {
         }
         const codeString = response.toRawString();
         fm.writeString(module.filename, codeString);
-
         const reqTranslations = new Request("https://raw.githubusercontent.com/flopp999/Scriptable-NordPool/main/Translations.json");
         reqTranslations.timeoutInterval = 1;
         const responseTranslations = await reqTranslations.load();
@@ -160,26 +161,27 @@ async function readsettings() {
 			if (settings.includevat !== 0  && settings.includevat !== 1) {
 				await askForIncludeVAT();
 			}
-	if (!settings.vat || settings.vat.length === 0) {
+			if (!settings.vat || settings.vat.length === 0) {
 				await askForIncludeVAT();
 			}
-	if (settings.extras !== 0 && settings.extras !== 1) {
-				await askForExtras();
-			}
+			if (isNaN(Number(settings.extras))) {
+        await askForExtras();
+      }
       if (settings.highlow !== 0 && settings.highlow !== 1) {
-				await askForHighLow();
+				settings.highlow = 1
+				//await askForHighLow();
 			}
       if (settings.notificationSet !== 0 && settings.notificationSet !== 1) {
 				settings.notificationSet = 0;
 			}
       if (settings.notificationSetTomorrow !== 0 && settings.notificationSetTomorrow !== 1) {
-				settings.notificationSetTomorrow = 0;
+				settings.notificationSetTomorrow = 1;
 			}	
-
 			if (!settings.currency || settings.currency.length === 0) {
 				await askForArea();
 			}
-    } else {
+      
+		} else {
       if (config.runsInWidget) {
         return;
       }
@@ -249,85 +251,38 @@ async function ask() {
   settings.extras = await askForExtras();
   await askForAllShowPositions("top");
   await askForHighLow();
-  settings.resolution = 60;
+  settings.resolution = await askForResolution();
+  //settings.resolution = 60;
   return settings
 }
 
 async function askForAllShowPositions() {
-  const options = ["graph", "table", "pricestats", "nothing"];
-  const days = ["today", "tomorrow"];
-  //const graphTypes = ["line", "bar"];
-  const chosenCombinations = [];
-  const positions = ["top", "middle", "bottom"];
-  const graphOption = {};
-  for (let position of positions) {
-    const usedCount = (type) =>
-      chosenCombinations.filter(c => c && c.type === type).length;
-
-    const usedGraph = usedCount("graph");
-    const usedTable = usedCount("table");
-
-    let filteredOptions = options.filter(type => {
-      if (type === "graph" && usedGraph >= 2) return false;
-      if (type === "table" && usedTable >= 2) return false;
-      if ((usedGraph + usedTable) >= 3 && (type === "graph" || type === "table")) return false;
-      return true;
-    });
-
-    const alert = new Alert();
-    alert.message = `${t("showwhat")} ${t(position)}?`;
-    filteredOptions.forEach(o => alert.addAction(t(o)));
-    const index = await alert.presentAlert();
-    const choice = filteredOptions[index];
-
-    let day = "";
-    
-    if (choice !== "nothing") {
-      const usedDaysForType = chosenCombinations
-        .filter(c => c.type === choice)
-        .map(c => c.day);
-      const availableDays = days.filter(d => !usedDaysForType.includes(d));
-      const dayAlert = new Alert();
-      dayAlert.title = t(position).charAt(0).toUpperCase() + t(position).slice(1);
-      dayAlert.message = t("showday") + "?";
-      availableDays.forEach(d => dayAlert.addAction(t(d)));
-      const dayIndex = await dayAlert.presentAlert();
-      day = availableDays[dayIndex];
-    }
-
-    chosenCombinations.push({ position, type: choice, day });
-    settings[`showat${position}`] = `${choice}, ${day}`;
-  }
-  settings.graphOption = graphOption;
-  
+  const options = ["graph", "table"];
+	const days = ["today", "tomorrow"];
+	//const graphOption = {};
+	// Fråga först: graph eller table
+	const alert = new Alert();
+	alert.message = t("showwhat") + "?";
+	options.forEach(o => alert.addAction(t(o)));
+	const index = await alert.presentAlert();
+	const choice = options[index];
+	// Fråga sedan: today eller tomorrow
+	const dayAlert = new Alert();
+	dayAlert.message = t("showday") + "?";
+	days.forEach(d => dayAlert.addAction(t(d)));
+	const dayIndex = await dayAlert.presentAlert();
+	const day = days[dayIndex];
+	// Spara i settings
+	//graphOption.type = choice;
+	//graphOption.day = day;
+	settings.showattop = `${choice}, ${day}`
+	settings.showatbottom = `pricestats, ${day}`
+	//settings.graphOption = graphOption;
   fm.writeString(filePathSettings, JSON.stringify(settings, null, 2));
-  const totalGraph = chosenCombinations.filter(c => c.type === "graph").length;
-  const totalTable = chosenCombinations.filter(c => c.type === "table").length;
-  const totalPriceStats = chosenCombinations.filter(c => c.type === "pricestats").length;
-  const heightMap = {
-    "1-0-0": 1200,
-    "0-1-0": 800,
-    "0-0-1": 800,
-  
-    "1-1-0": 750,
-    "1-0-1": 1130,
-    "0-1-1": 900,
-    "2-0-0": 550,
-    "0-2-0": 600,
-  
-    "1-1-1": 730,
-    "2-1-0": 380,
-    "1-2-0": 540,
-    "2-0-1": 470,
-    "0-2-1": 580,
-    "1-0-2": 1050,
-    "0-1-2": 900,
-  };
-  
-  const key = `${totalGraph}-${totalTable}-${totalPriceStats}`;
-  settings.height = heightMap[key] ?? 1150;
+  //const key = `${totalGraph}-${totalTable}-${totalPriceStats}`;
+  //settings.height = 1150;
   return settings;
-  }
+ }
 
 async function askForLanguage() {
   let alert = new Alert();
@@ -536,7 +491,8 @@ async function Table(day) {
           }
           break
         }
-        if (i === hour && minute >= a * 15 && minute < (a + 1) * 15) { // actual hour and identifies which 15-minute interval
+        if (i === hour && day == "today" && minute >= a * 15 && minute < (a + 1) * 15) { // actual hour and identifies which 15-minute interval
+          hour=i*4+a
           timeText.textColor = new Color("#00ffff");
           timeText.font = Font.lightSystemFont(bigFont);
         } else {
@@ -572,7 +528,7 @@ async function Table(day) {
       } else if (pricesJSON[i] == priceHighest){
         priceText.textColor = new Color("#fa60ff"); // purple
       } else if (pricesJSON[i] > priceHighest - priceDiff) {
-        priceText.textColor =  new Color("#ff3000"); // red
+        priceText.textColor =  new Color("#ff3300"); // red
       } else {
         priceText.textColor = new Color("#f38"); // orange
       }
@@ -581,9 +537,29 @@ async function Table(day) {
   listwidget.addSpacer(5);
 }
 
-async function Graph(day, graphOption) {
+async function Graph(day) {
 //chart
   await nordpoolData(day);
+  if (pricesJSON.length == 24) {
+   hours = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+   zeroline = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  }
+  else {
+   hours = [
+   0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,
+   5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,9,9,
+   10,10,10,10,11,11,11,11,12,12,12,12,13,13,13,13,
+   14,14,14,14,15,15,15,15,16,16,16,16,17,17,17,17,
+   18,18,18,18,19,19,19,19,20,20,20,20,21,21,21,21,
+   22,22,22,22,23,23,23,23
+  ];
+  zeroline = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  //hours = hours + hours
+  //zeroline = zeroline + zeroline
+  }
   if (daybefore != day && size != "small"){ 
     let left = listwidget.addStack();
 	  let whatday
@@ -610,10 +586,9 @@ async function Graph(day, graphOption) {
       updatetext.textColor = new Color("#ffffff");
     }
   }
-  log("message")
   daybefore = day;
   //listwidget.addSpacer(13)
-  if (resolution == 60) {
+  if (hour != 1111) {
     let avgtoday = []
     let dotNow = ""
     let countertoday = 0
@@ -623,18 +598,39 @@ async function Graph(day, graphOption) {
       avgtoday += priceAvg + ","
       countertoday += 1
     }
-    while (countertoday < 24)
+    while (countertoday < pricesJSON.length)
     
     do{
-      if (hour == counterdot && day == "today") {
-        dotNow += pricesJSON[counterdot] + ","
+      if (pricesJSON.length == 24){
+        if (hour == counterdot && day == "today") {
+          dotNow += pricesJSON[counterdot] + ","
+        }
+        else {
+          dotNow += ","
+        }
       }
       else {
-        dotNow += ","
+        if (hour*4 == counterdot) {
+          for (let a = 0; a < 4; a++) {
+            if (day == "today" && minute >= a * 15 && minute < (a + 1) * 15) { // actual hour and identifies which 15-minute interval
+              hour=hour*4+a
+              dotNow += pricesJSON[hour] + ","
+            } else {
+            dotNow += ","}
+          }
+        } else {
+            dotNow += ","
+        }
       }
       counterdot += 1
     }
-    while (counterdot < 24)
+    while (counterdot < pricesJSON.length)
+    //avgtoday += avgtoday
+    //pricesJSON2 = 
+    //await nordpoolData("tomorrow");
+    //pricesJSON = pricesJSON + "," + pricesJSON
+    //log(pricesJSON)
+    //pricesJSON = pricesJSONnew + "," + pricesJSON
     let graphtoday = "https://quickchart.io/chart?bkg=black&w=1300&h="+settings.height+"&c="
     graphtoday += encodeURI("{\
       data: { \
@@ -654,14 +650,16 @@ async function Graph(day, graphOption) {
             fill: false,\
             borderColor: 'orange',\
             borderWidth: 6,\
-            pointRadius: 0\
+            pointRadius: 0,\
+            order: 4\
           },\
           {\
-            data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\
+            data: ["+zeroline+"],\
             type: 'line',\
             fill: false,\
             borderColor: 'rgb(255,255,255)',\
             borderWidth: 6,\
+            order: 5,\
             pointRadius: 0\
           },\
           {\
@@ -669,7 +667,7 @@ async function Graph(day, graphOption) {
             type: 'line',\
             fill: false,\
             borderColor: getGradientFillHelper('vertical',['rgb(255,25,255)','rgb(255,48,8)','orange','rgb(255,255,0)','rgb(0,150,0)']),\
-            borderWidth: 20, \
+            borderWidth: 10, \
             pointRadius: 0\
           },\
         ]\
@@ -684,7 +682,7 @@ async function Graph(day, graphOption) {
             {\
               xAxes: [{\
                 offset:true,\
-                ticks:{fontSize:35,fontColor:'white'}\
+                ticks:{maxTicksLimit:24, maxRotation:0,fontSize:35,fontColor:'white'}\
               }],\
               yAxes: [{\
                 ticks:{stepSize:10,beginAtZero:true,fontSize:35,fontColor:'white'}\
@@ -694,7 +692,7 @@ async function Graph(day, graphOption) {
     }")
     graphtoday.timeoutInterval = 10;
     const GRAPH = await new Request(graphtoday).loadImage()
-    log(":33")
+    
     //let emptyrow = listwidget.addStack()
     
     //listwidget.addSpacer(5)
@@ -740,7 +738,17 @@ async function PriceStats(day) {
   }
   let bottom = listwidget.addStack();
   if (day != "tomorrow"){
-    let now = bottom.addText(t("now") + " " + Math.round(pricesJSON[hour]));
+    let now;
+    if (pricesJSON.length == 24){
+      now = bottom.addText(t("now") + " " + Math.round(pricesJSON[hour]));
+    }
+    else {
+      const nowdate = new Date()
+      const nowminute = nowdate.getMinutes()
+      const block = Math.floor(nowminute/15)
+      
+      now = bottom.addText(t("now") + " " + Math.round(pricesJSON[hour]));
+    }
     now.font = Font.lightSystemFont(11);
     now.textColor = new Color("#00ffff");
     bottom.addSpacer();
@@ -778,9 +786,12 @@ async function PriceStats(day) {
 }
 
 const smallFont = 10;
-const mediumFont = 12;
-const bigFont = 13.5;
-const hours = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+const mediumFont = 11.5;
+const bigFont = 12.5;
+
+  
+  //0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+
 const now = new Date();
 const yyyy = now.getFullYear();
 const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -789,23 +800,29 @@ date = `${yyyy}-${mm}-${dd}`;
 todaydate = `${yyyy}-${mm}-${dd}`;
 const ddtomorrow = String(now.getDate() + 1).padStart(2, '0');
 tomorrowdate = `${yyyy}-${mm}-${ddtomorrow}`;
+hour = now.getHours();
+minute = now.getMinutes();
 
 async function nordpoolData(day) {
   allValues = [];
+  allValues2 = [];
   Path = fm.joinPath(dir, "NordPool_" + day + "Prices.json");
   DateObj = new Date();
   async function getData() {
     if (day == "tomorrow") {
-      DateObj.setDate(DateObj.getDate() + 1);
-			settings.notificationSetTomorrow = 0;
+      settings.notificationSetTomorrow = 0;
     } else {
-      log("bot")
       settings.notificationSet = 0;
     }
     const yyyy = DateObj.getFullYear();
     const mm = String(DateObj.getMonth() + 1).padStart(2, '0');
     const dd = String(DateObj.getDate()).padStart(2, '0');
-    const date = `${yyyy}-${mm}-${dd}`;
+    let date = `${yyyy}-${mm}-${dd}`;
+    //log(tomorrowdate)
+    //if (day == "tomorrow") {
+      //date = tomorrowdate
+      //settings.notificationSetTomorrow = 0;
+    //}
     const Url = `https://dataportal-api.nordpoolgroup.com/api/DayAheadPriceIndices?date=${date}&market=DayAhead&indexNames=${area}&currency=${currency}&resolutionInMinutes=${resolution}`;
     const request = new Request(Url);
     request.timeoutInterval = 1;
@@ -832,9 +849,7 @@ async function nordpoolData(day) {
   } else {
     await getData();
   }
-  await getData();
-  hour = DateObj.getHours();
-  minute = DateObj.getMinutes();
+  //await getData();
   let content = fm.readString(Path);
   response = JSON.parse(content);
   date = response.deliveryDateCET;  
@@ -850,11 +865,11 @@ async function nordpoolData(day) {
   priceHighest = (Math.max(...pricesJSON.map(Number)));
   priceDiff = (priceHighest - priceLowest)/3;
   priceAvg = pricesJSON.map(Number).reduce((a, b) => a + b, 0) / pricesJSON.length;
-	  highTime = pricesJSON.map(Number).indexOf(priceHighest)
+  highTime = pricesJSON.map(Number).indexOf(priceHighest)
   lowTime = pricesJSON.map(Number).indexOf(priceLowest)
   //log(Notification.allPending())
   if (prices != 0 && settings.highlow == 1)  {
-   //log("set")
+   
      //let pending = await Notification.allPending()
     //console.log(pending)
     await setNotification(day);
@@ -862,40 +877,52 @@ async function nordpoolData(day) {
 }
 
 async function setNotification(day) {
-//log("message")
+
 //let pending = await Notification.allPending()
 //console.log(pending)
 //await Notification.removeAllDelivered()
-await Notification.removeAllPending()
-//log(settings)
+
 let today = new Date()
 if (day == "tomorrow" && settings.notificationSetTomorrow == 0) {
+  await Notification.removeAllPending()
   let highnot = new Notification()
   highnot.title = "Högsta elpriset"
   highnot.body = `Elpriset är som högst klockan ${highTime}, ${Math.round(priceHighest)} öre/kWh)`
-  highnot.sound = "default"
+  highnot.sound = "piano_error"
   await highnot.schedule()
 
   let lownot = new Notification()
   lownot.title = "Lägsta elpriset"
   lownot.body = `Elpriset är som lägst klockan ${lowTime}, ${Math.round(priceLowest)} öre/kWh)`
-  lownot.sound = "default"
+  lownot.sound = "piano_success"
   await lownot.schedule()
   settings.notificationSetTomorrow = 1
 
 } else if (settings.notificationSet == 0) {
+  await Notification.removeAllPending()
   let highnot = new Notification()
   highnot.title = "Högsta elpriset"
   highnot.body = `Elpriset är som högst nu, ${Math.round(priceHighest)} öre/kWh)`
   highnot.sound = "default"
-  highnot.setTriggerDate(new Date(today.getFullYear(), today.getMonth(), today.getDate(), highTime,00))
+  hourtime = Math.floor(highTime / 4);     // varje timme = 4 kvart
+  quarter = highTime % 4;              // resterande kvart i timmen (0–3)
+
+// För att skapa rätt tid (kvart = 0, 1, 2, 3 motsvarar 00, 15, 30, 45 min):
+  minutes = quarter * 15;
+  highnot.setTriggerDate(new Date(today.getFullYear(), today.getMonth(), today.getDate(), hourtime,minutes))
   await highnot.schedule()
 
   let lownot = new Notification()
   lownot.title = "Lägsta elpriset"
   lownot.body = `Elpriset är som lägst nu, ${Math.round(priceLowest)} öre/kWh)`
   lownot.sound = "default"
-  lownot.setTriggerDate(new Date(today.getFullYear(), today.getMonth(), today.getDate(), lowTime,00))
+  hourtime = Math.floor(lowTime / 4);     // varje timme = 4 kvart
+  quarter = lowTime % 4;              // resterande kvart i timmen (0–3)
+
+// För att skapa rätt tid (kvart = 0, 1, 2, 3 motsvarar 00, 15, 30, 45 min):
+  minutes = quarter * 15;
+
+  lownot.setTriggerDate(new Date(today.getFullYear(), today.getMonth(), today.getDate(), hourtime,minutes))
   await lownot.schedule()
   settings.notificationSet = 1
 
@@ -908,14 +935,17 @@ async function renderSection(position) {
   if (!value || value === "nothing") {
     return;
   }
-  const [type, day] = value.split(",").map(s => s.trim());
-  const graphOption = settings.graphOption[position]
-  switch (type) {
+  let [type, day] = value.split(",").map(s => s.trim());
+  //const graphOption = settings.graphOption[position]
+  settings.showatbottom = `pricestats, ${day}`
+  if (position == "top" && type == "pricestats") {type = "graph"}
+  
+   switch (type) {
     case "table":
       await Table(day);
       break;
     case "graph":
-      await Graph(day, graphOption);
+      await Graph(day, "line");
       break;
     case "pricestats":
       await PriceStats(day);
@@ -929,9 +959,11 @@ listwidget.backgroundColor = new Color("#000000");
 
 async function createWidgetLarge(){
   //listwidget.backgroundColor = new Color("#000000");
+  settings.height = 1050;
   await renderSection("top");
-  await renderSection("middle");
+  //await renderSection("middle");
   await renderSection("bottom");  
+  
   let moms = listwidget.addStack();
   momstext = moms.addText("v. " + version);
   momstext.font = Font.lightSystemFont(10);
@@ -978,7 +1010,7 @@ async function createWidgetLarge(){
 async function createWidgetSmall() {
   settings.height = 620;
   if (internet == true) { await renderSection("top");}
-  await renderSection("middle");
+  //await renderSection("middle");
   await renderSection("bottom");let moms = listwidget.addStack();
   momstext = moms.addText("v. " + version);
   momstext.font = Font.lightSystemFont(10);
@@ -1010,7 +1042,7 @@ async function createWidgetMedium() {
   settings.height = 290
   //listwidget.addSpacer(15)
   //await renderSection("top");
-  await renderSection("middle");
+  //await renderSection("middle");
   await renderSection("bottom");  
   let moms = listwidget.addStack();
   momstext = moms.addText("v. " + version);
@@ -1150,22 +1182,19 @@ async function createWidgetAccessoryInline() {
 //   return w;
 // }
 
-// === BESTÄM STORLEK ===
-
 let size = config.widgetFamily;
 
-// Om vi kör i appen (ingen storlek satt) → fråga användaren
 if (!size) {
   let alert = new Alert();
-  alert.title = "Välj widget-storlek";
+  alert.title = "Test widget-size";
   alert.addAction("Small");
   alert.addAction("Medium");
   alert.addAction("Large");
-  alert.addAction("Accessory Circular");
-  alert.addAction("Accessory Rectangular");
-  alert.addAction("Accessory Inline");
+  //alert.addAction("Accessory Circular");
+  //alert.addAction("Accessory Rectangular");
+  //alert.addAction("Accessory Inline");
   let response = await alert.presentSheet();
-log(response)
+
   // Support-popup ibland
   if (Math.random() < 0.0) {
     let alert = new Alert();
@@ -1188,8 +1217,6 @@ log(response)
   if (response === 5) size = "accessoryInline";
 }
 
-// === SKAPA RÄTT WIDGET ===
-log(size)
 switch (size) {
   case "small":
     widget = await createWidgetSmall();
@@ -1211,9 +1238,8 @@ switch (size) {
     break;
 }
 
-// === VISA WIDGET ===
 if (!config.runsInWidget) {
-  log(size)
+  
   if (size === "small") await widget.presentSmall();
   if (size === "medium") await widget.presentMedium();
   if (size === "large") await widget.presentLarge();
