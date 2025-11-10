@@ -1,7 +1,7 @@
 // License: Personal use only. See LICENSE for details.
 // This script was created by Flopp999
 // Support me with a coffee https://www.buymeacoffee.com/flopp999 
-let version = 0.810
+let version = 0.811
 let notificationSet;
 let highTime;
 let lowTime;
@@ -819,10 +819,10 @@ async function nordpoolData(day) {
     const dd = String(DateObj.getDate()).padStart(2, '0');
     let date = `${yyyy}-${mm}-${dd}`;
     //log(tomorrowdate)
-    //if (day == "tomorrow") {
-      //date = tomorrowdate
+    if (day == "tomorrow") {
+      date = tomorrowdate
       //settings.notificationSetTomorrow = 0;
-    //}
+    }
     const Url = `https://dataportal-api.nordpoolgroup.com/api/DayAheadPriceIndices?date=${date}&market=DayAhead&indexNames=${area}&currency=${currency}&resolutionInMinutes=${resolution}`;
     const request = new Request(Url);
     request.timeoutInterval = 1;
